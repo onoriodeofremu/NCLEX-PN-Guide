@@ -57,7 +57,13 @@ def _get_conn():
                 );
             """)
         return conn
-    except Exception:
+    except Exception as e:
+        # Printed (not raised) so the app keeps working on local files even
+        # when the database can't connect. On Streamlit Community Cloud,
+        # this line shows up in "Manage app" -> the logs panel, which is
+        # the fastest way to see the *real* reason a connection failed
+        # (bad password, wrong host, SSL required, etc.) instead of guessing.
+        print(f"[storage] Database connection failed, falling back to local files: {e!r}")
         return None
 
 
