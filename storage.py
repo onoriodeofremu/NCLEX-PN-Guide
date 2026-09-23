@@ -37,6 +37,10 @@ def _get_conn():
     uses local files instead)."""
     url = _db_url()
     if not url:
+        import sys
+        print("[storage] No [database] url found in st.secrets - using local files. "
+              "If you expected a database, check Settings -> Secrets on Streamlit Cloud.",
+              file=sys.stderr, flush=True)
         return None
     try:
         import psycopg2
@@ -63,7 +67,13 @@ def _get_conn():
         # this line shows up in "Manage app" -> the logs panel, which is
         # the fastest way to see the *real* reason a connection failed
         # (bad password, wrong host, SSL required, etc.) instead of guessing.
-        print(f"[storage] Database connection failed, falling back to local files: {e!r}")
+        # flush=True + stderr: stdout is block-buffered (not line-buffered)
+        # inside Streamlit Cloud's container, so a plain print() can sit in
+        # a buffer and never reach the visible log stream until the process
+        # exits. Writing to stderr and forcing a flush makes sure this
+        # actually shows up right away.
+        import sys
+        print(f"[storage] Database connection failed, falling back to local files: {e!r}", file=sys.stderr, flush=True)
         return None
 
 
