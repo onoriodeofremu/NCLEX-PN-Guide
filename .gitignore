@@ -1,0 +1,9 @@
+# Never commit secrets or personal data
+.streamlit/secrets.toml
+users.json
+progress/
+progress_state.json
+
+__pycache__/
+*.pyc
+.DS_Store
